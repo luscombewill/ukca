@@ -162,12 +162,17 @@ INTEGER(KIND=jpim), PARAMETER :: zhook_out = 1
 REAL(KIND=jprb)               :: zhook_handle
 
 CHARACTER(LEN=*), PARAMETER :: RoutineName='SET_DDEPAER_COEFF'
+! DEBUGGING !
+WRITE(umMessage, '(A43)') 'MARK OF HERMES: Checkpoint 1a: Start of set_ddepaer'
+CALL umPrint(umMessage, src=RoutineName)
 
 IF (lhook) CALL dr_hook(ModuleName//':'//RoutineName,zhook_in,zhook_handle)
 
 ! New method
 IF (l_improve_aero_drydep) THEN
-
+  ! DEBUGGING !
+  WRITE(umMessage, '(A43)') 'MARK OF HERMES: Checkpoint 1b1: Start of improved method'
+  CALL umPrint(umMessage, src=RoutineName)
   ALLOCATE(alpha( SIZE(alpha_fix) ))
   ALLOCATE(cr( SIZE(cr_fix) ))
   ALLOCATE(yr( SIZE(yr_fix) ))
@@ -181,6 +186,9 @@ IF (l_improve_aero_drydep) THEN
   ls_ice   = zhg_ice
   ls_water = zhg_inl_water
   ls_ocean = zhg_ocean
+  ! DEBUGGING !
+  WRITE(umMessage, '(A43)') 'MARK OF HERMES: Checkpoint 1b2: End of improved method'
+  CALL umPrint(umMessage, src=RoutineName)
 
 ELSE
 
@@ -206,7 +214,9 @@ ELSE
   ! The category (water,forest,grass,desert) is determined earlier
   ! based on roughness length znot (desert not used at present)
   !--------------------------------------------------------------------
-
+  ! DEBUGGING !
+  WRITE(umMessage, '(A43)') 'MARK OF HERMES: Checkpoint 1c1: Start of old method'
+  CALL umPrint(umMessage, src=RoutineName)
   IF ((ukca_config%ntype == 27) .OR.                                           &
     (ukca_config%ntype == 17) .OR.                                             &
     (ukca_config%ntype == 13)) THEN
@@ -265,10 +275,19 @@ ELSE
   ls_soil  = 8
   ls_ice   = 9
 
+  ! DEBUGGING !
+  WRITE(umMessage, '(A43)') 'MARK OF HERMES: Checkpoint 1c2: End of old method'
+  CALL umPrint(umMessage, src=RoutineName)
+
 END IF    ! l_improve_aero_drydep
+! DEBUGGING !
+  WRITE(umMessage, '(A43)') 'MARK OF HERMES: Checkpoint 1z: End of set_ddepaer'
+  CALL umPrint(umMessage, src=RoutineName)
 
 IF (lhook) CALL dr_hook(ModuleName//':'//RoutineName,zhook_out,zhook_handle)
 RETURN
+
+
 END SUBROUTINE set_ddepaer_coeff
 
 END MODULE ukca_ddepaer_coeff_mod

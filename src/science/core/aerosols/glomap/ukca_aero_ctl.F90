@@ -971,6 +971,7 @@ ELSE
   cond_on = 0
   coag_on = 0
 END IF
+
 !
 IF (firstcall .AND. verbose > 0) THEN
   WRITE(umMessage, '(A16,2I6)') 'NUCL_ON,BLN_ON=', nucl_on,bln_on
@@ -1231,11 +1232,17 @@ IF (firstcall) THEN
   ! Allocate the coefficients required for aerosol dry deposition.
   ! The values used are chosen based on l_improve_aero_drydep
   ! The arrays are independent of location, so can be initialised once.
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 1: Pre-dry dep coeff'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
   CALL set_ddepaer_coeff(glomap_config%l_improve_aero_drydep)
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 2: Post-dry dep coeff'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
 END IF   ! firstcall
 
-! the all_ntp array is at end of segment loop in this case to accumulate SA
+WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 3: Post first call'
+CALL umPrint(umMessage, src='ukca_aero_ctl')
+
 i = name2ntpindex('surfarea  ')
 all_ntp(i)%data_3d(:, :, :) = 0.0
 n_merge_3d(:, :, :, :) = 0
@@ -1249,6 +1256,9 @@ nbadmdt_3d(:, :, :, :) = 0
 
 ! other precomputations
 CALL log_v(nmodes, sigmag, log_sigmag)
+
+WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 3: Post log_v'
+CALL umPrint(umMessage, src='ukca_aero_ctl')
 
 ! Allocate the drydiam array (input to UKCA_ACTIVATE) if required.
 IF ( ( glomap_config%i_ukca_activation_scheme == i_ukca_activation_arg )       &
@@ -1386,6 +1396,9 @@ IF ( nseg > 1 ) THEN
   END IF  ! last segment is smaller
 END IF  ! nseg > 1
 
+WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 3: Post non uniform seg'
+CALL umPrint(umMessage, src='ukca_aero_ctl')
+
 !$OMP DO SCHEDULE(DYNAMIC)
 DO ik = 1, nseg
   ! use local alias because they are used in  many places within  loop
@@ -1397,6 +1410,8 @@ DO ik = 1, nseg
                                       lb, ncs, nbs, nseg, ik
     CALL umPrint(umMessage, src='ukca_aero_ctl')
   END IF
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 4'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   ! Now work out which grid box is above each grid box
   jl = 0
@@ -1414,7 +1429,8 @@ DO ik = 1, nseg
     seg_iarr(jl) = lb/rows                   ! this is latitude
     seg_larr(jl) = l                         ! this is altitude (level)
   END DO                                     ! for each column
-
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 5'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
   DO i = 0, nmodes
     nbs_index(i) = i * nbs
   END DO
@@ -1422,7 +1438,8 @@ DO ik = 1, nseg
   DO jl = 1, nbs * nmodes
     seg_n_merge_1d(jl) = 0
   END DO
-
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 6'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
   ! Reshape input quantities
   ! ========================
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
@@ -1446,7 +1463,8 @@ DO ik = 1, nseg
   ! NOTE previously accumulated a3d_tmp = autoconv+accretion+rim_agg+rim_cry
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
                    a3d_tmp(1, 1, 1), seg_autoconv1d(1))
-
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 7'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
   ! .. set CRAING_UP using JLABOVE as calculated above
   DO jl = 1, nbs   ! limit is number of boxes on this segment
     IF (seg_jlabove(jl) > 0) THEN
@@ -1467,11 +1485,17 @@ DO ik = 1, nseg
     seg_aird(jl) = seg_pmid(jl) / (seg_t(jl) * boltzmann * 1.0e6)
   END DO
 
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 8'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
+
   ! copy from delso2_wet_xxx arrays as output from UKCA_CHEMISTRY_CTL
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
                    delso2_wet_h2o2(1, 1, 1), seg_delso2(1))
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
                    delso2_wet_o3(1, 1, 1), seg_delso2_2(1))
+
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 9'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   ! Scale in-cloud production rates to account for lack of
   ! in-cloud wet removal of oxidised SO2
@@ -1496,21 +1520,50 @@ DO ik = 1, nseg
                    rh3d_clr(1, 1, 1), seg_rh_clr(1))
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
                    q(1, 1, 1), seg_s(1))
-  CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
-                   cloud_liq_wat(1, 1, 1), seg_lwc(1))
-  CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
-                   cloud_liq_wat(1, 1, 1), seg_clwc(1))
 
+  IF (wetox_on == 1 ) THEN
+    ! Only properly extract this var if it will be used in ukca_aero_step
+    CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                     &
+                     cloud_liq_wat(1, 1, 1), seg_lwc(1))
+  ELSE
+    ! If not needed in ukca_aero_step, just set all values to 0.0
+    seg_lwc = 0.0
+  END IF
+
+  IF (rainout_on == 1) THEN
+    ! Only properly extract this var if it will be used in ukca_aero_step
+    CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                     &
+                     cloud_liq_wat(1, 1, 1), seg_clwc(1))
+  ELSE
+    ! If not needed in ukca_aero_step, just set all values to 0.0
+    seg_clwc = 0.0
+  END IF
+
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
   DO jl = 1, nbs
     seg_lowcloud(jl) = 0.0
     seg_vfac(jl)     = 0.0
     seg_clf(jl)      = 0.0
   END DO
 
-  CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
-                   cloud_liq_frac(1, 1, 1), seg_clf(1))
-  CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
-                   cloud_frac(1, 1, 1), seg_lowcloud(1))
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10.1'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
+  
+  IF (rainout_on == 1) THEN
+    ! Only properly extract this var if it will be used in ukca_aero_step
+    CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                     &
+                     cloud_liq_frac(1, 1, 1), seg_clf(1))
+  END IF 
+
+  IF (wetox_on == 1 .OR. iactmethod > 0) THEN
+    ! Only properly extract this var if it will be used in ukca_aero_step
+    CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                     &
+                     cloud_frac(1, 1, 1), seg_lowcloud(1))
+  END IF
+
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10.2'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   DO jl = 1, nbs
     IF (seg_lowcloud(jl) > 0.0) THEN
@@ -1518,9 +1571,15 @@ DO ik = 1, nseg
       seg_vfac(jl) = 1.0
     END IF
   END DO
+  
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10.3'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
                    z_half_alllevs(1, 1, 1), seg_height(1))
+
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10.4'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   ! GM added code here to only set cloud fraction > 0 if in low cloud
   !    here low cloud is defined as being cloud with p>=680hPa
@@ -1531,6 +1590,9 @@ DO ik = 1, nseg
       seg_lwc(jl) = 0.0
     END IF
   END DO
+
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 11'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
   !
   ! 2D surface -> whole segment
   CALL surface_to_seg(lb, ncs, nbs, stride_s, model_levels,                    &
@@ -1545,6 +1607,9 @@ DO ik = 1, nseg
   CALL surface_to_seg(lb, ncs, nbs, stride_s, model_levels,                    &
                       zbl(1, 1), seg_htpblg(1))
 
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 12'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
+  
   jl = 0
   DO ic = 1, ncs                 ! for each column on segment
     jl = jl +1                   ! at surface layer jl = 1
@@ -1614,6 +1679,9 @@ DO ik = 1, nseg
                     (SQRT(seg_t(jl) / 296.16)**3)
     seg_mfpa(jl) = 2.0 * seg_dvisc(jl)/(seg_rhoa(jl) * seg_vba(jl))
   END DO
+
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 13'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   ! Mass air (kg/box)
   CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                       &
@@ -1758,6 +1826,9 @@ DO ik = 1, nseg
     END DO
   END IF
 
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 14'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
+
   ! .. Secondary Organic tracer mmr in kg[Sec_Org]/kg[dryair]
   IF (msec_org > 0) THEN
     CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                     &
@@ -1802,6 +1873,8 @@ DO ik = 1, nseg
     END DO
   END IF
 
+  WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 15'
+  CALL umPrint(umMessage, src='ukca_aero_ctl')  
 
   ! Aerosol Tracers
   ! ===============

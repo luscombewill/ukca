@@ -1228,12 +1228,12 @@ END IF
 
 ! Settings for managing photolysis environmental driver
 ! requirements on behalf of external UKCA Photolysis code
+ukca_config%i_photol_scheme = 0
+ukca_config%i_photol_scheme_off = 0
 
 IF (ukca_config%i_ukca_chem /= i_ukca_chem_off) THEN
 
-  ukca_config%i_photol_scheme = 0
-  ukca_config%i_photol_scheme_off = 0
-
+  
   IF (PRESENT(i_photol_scheme)) THEN
 
     ukca_config%i_photol_scheme = i_photol_scheme
