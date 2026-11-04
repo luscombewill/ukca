@@ -385,6 +385,10 @@ INTEGER(KIND=jpim), PARAMETER :: zhook_in  = 0
 INTEGER(KIND=jpim), PARAMETER :: zhook_out = 1
 REAL(KIND=jprb)               :: zhook_handle
 
+! ------ Testing fix -------- !
+! REAL :: znot_local(nbox)
+! --------------------------- !
+
 CHARACTER(LEN=*), PARAMETER   :: RoutineName='UKCA_DDEPAER_INCL_SEDI'
 
 IF (lhook) CALL dr_hook(ModuleName//':'//RoutineName,zhook_in,zhook_handle)
@@ -431,7 +435,17 @@ kvisc(:)=dvisc(:)/rhoa(:) ! Calculate kinematic viscosity of air
 masksurf(:)=(surtp(:) < 2.0) ! create mask for boxes at surface.
 
 ! .. Calculate aerodynamic resistance (only in gridboxes at surface)
-WHERE (masksurf(:)) ar(:)=LOG(dzmid(:)/znot(:))/(vkman*ustr(:))
+
+! ------ Testing fix -------- !
+! znot_local = min(znot(:),0.9*dzmid(:))
+! WHERE (masksurf(:)) ar(:)=LOG(dzmid(:)/znot_local(:))/(vkman*ustr(:))
+! --------------------------- !
+
+! ------ Testing fix 2 ------ !
+WHERE (masksurf(:)) ar(:)=LOG((dzmid(:)+ znot(:))/znot(:))/(vkman*ustr(:))
+! --------------------------- !
+
+! WHERE (masksurf(:)) ar(:)=LOG(dzmid(:)/znot(:))/(vkman*ustr(:))
 
 DO imode=1,nmodes
   IF (mode(imode)) THEN

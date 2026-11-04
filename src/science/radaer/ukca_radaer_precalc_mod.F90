@@ -27,7 +27,7 @@ INTEGER, PARAMETER :: npd_integ_pts = 6
 ! npd_ukca_band must be as large as the number of SW or LW bands
 ! (whichever is the largest), as given in the spectral files.
 !
-INTEGER, PARAMETER :: npd_ukca_band = 9
+INTEGER, PARAMETER :: npd_ukca_band = 42
 
 !
 ! Number of spectra (SW and LW, typically).
