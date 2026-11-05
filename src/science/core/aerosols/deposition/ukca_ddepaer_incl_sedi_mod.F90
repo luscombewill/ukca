@@ -436,16 +436,19 @@ masksurf(:)=(surtp(:) < 2.0) ! create mask for boxes at surface.
 
 ! .. Calculate aerodynamic resistance (only in gridboxes at surface)
 
-! ------ Testing fix -------- !
+! ------ Testing fixes -------- !
+
+!!! First attempt: limit znot to never be bigger than dzmid
 ! znot_local = min(znot(:),0.9*dzmid(:))
 ! WHERE (masksurf(:)) ar(:)=LOG(dzmid(:)/znot_local(:))/(vkman*ustr(:))
-! --------------------------- !
 
-! ------ Testing fix 2 ------ !
-WHERE (masksurf(:)) ar(:)=LOG((dzmid(:)+ znot(:))/znot(:))/(vkman*ustr(:))
-! --------------------------- !
+!!! Second Attempt: Fix that worked for Ben/Earth model
+!WHERE (masksurf(:)) ar(:)=LOG((dzmid(:)+ znot(:))/znot(:))/(vkman*ustr(:))
 
-! WHERE (masksurf(:)) ar(:)=LOG(dzmid(:)/znot(:))/(vkman*ustr(:))
+! ----------------------------- !
+
+!!! Original line:
+WHERE (masksurf(:)) ar(:)=LOG(dzmid(:)/znot(:))/(vkman*ustr(:))
 
 DO imode=1,nmodes
   IF (mode(imode)) THEN
