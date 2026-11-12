@@ -107,12 +107,12 @@ SUBROUTINE init_config_constants()
 
 IMPLICIT NONE
 
-! Planet Constants (Earth values by default)
-planet_radius = 6371229.0
-g = 9.80665
-r = 287.05
-cp = 1005.0
-pref = 100000.0
+! Planet Constants (Changed to Mars Values 12/11/26 by WL)
+planet_radius = 3389500.0
+g = 3.711
+r = 188.92
+cp = 791.0
+pref = 100000.0 !is same for Earth
 vkman = 0.4
 repsilon = 0.62198
 rv = r / repsilon
