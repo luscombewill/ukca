@@ -761,11 +761,11 @@ mm_da = avogadro * boltzmann/rgas
 ! to a top-level switch in UM --- prefer "devolved verbosity control" here.
 
 !------------------------------------------
-verbose_local = 0
-! verbose_local = 0 is default setting for when running model experiments
-! verbose_local = 2 is investigative setting for print statements to check
-!             evolution of size-resolved aerosol properties
-!             (number, mass, size) after each process
+
+! verbose_local = 0 ! is default setting for when running model experiments
+verbose_local = 2 ! is investigative setting for print statements to check
+!                   evolution of size-resolved aerosol properties
+!                   (number, mass, size) after each process
 !------------------------------------------
 ! Set BL nucleation parametrisation rate calculation method
 ibln = glomap_config%i_mode_bln_param_method
@@ -1563,12 +1563,12 @@ DO ik = 1, nseg
 
   WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10.1'
   CALL umPrint(umMessage, src='ukca_aero_ctl')
-  
+
   IF (rainout_on == 1) THEN
     ! Only properly extract this var if it will be used in ukca_aero_step
     CALL extract_seg(lb, ncs, nbs, stride_s, model_levels,                     &
                      cloud_liq_frac(1, 1, 1), seg_clf(1))
-  END IF 
+  END IF
 
   IF (wetox_on == 1 .OR. iactmethod > 0) THEN
     ! Only properly extract this var if it will be used in ukca_aero_step
@@ -1585,7 +1585,7 @@ DO ik = 1, nseg
       seg_vfac(jl) = 1.0
     END IF
   END DO
-  
+
   WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 10.3'
   CALL umPrint(umMessage, src='ukca_aero_ctl')
 
@@ -1623,7 +1623,7 @@ DO ik = 1, nseg
 
   WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 12'
   CALL umPrint(umMessage, src='ukca_aero_ctl')
-  
+
   jl = 0
   DO ic = 1, ncs                 ! for each column on segment
     jl = jl +1                   ! at surface layer jl = 1
@@ -1888,7 +1888,7 @@ DO ik = 1, nseg
   END IF
 
   WRITE(umMessage, '(A50)') 'MARK OF HERMES: Checkpoint 15'
-  CALL umPrint(umMessage, src='ukca_aero_ctl')  
+  CALL umPrint(umMessage, src='ukca_aero_ctl')
 
   ! Aerosol Tracers
   ! ===============
