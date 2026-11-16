@@ -1419,7 +1419,7 @@ DO ik = 1, nseg
   lb = lbase(ik)      ! base location on this segment
   ncs = ncol_s(ik)    ! The number of columns on this segment
   nbs = nbox_s(ik)    ! The number of boxes on this segment
-  IF (firstcall .AND. verbose > 2 ) THEN
+  IF (firstcall .AND. verbose >= 2 ) THEN
     WRITE(umMessage, '(A28,5(1x,i8))') 'AERO_CTL:lb,ncs,nbs,nseg,ik',          &
                                       lb, ncs, nbs, nseg, ik
     CALL umPrint(umMessage, src='ukca_aero_ctl')
