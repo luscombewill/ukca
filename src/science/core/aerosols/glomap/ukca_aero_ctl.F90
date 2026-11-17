@@ -469,7 +469,7 @@ INTEGER :: verbose_local ! local copy of glob_verbose to set independently
 ! from value of PRINT_STATUS in UKCA_MAIN (for GLOMAP de-bug
 ! uses this value within GLOMAP routines (other print statements
 ! in UKCA_AERO_CTL still controlled by PRINT_STATUS)
-INTEGER, PARAMETER :: checkmd_nd = 1
+INTEGER, PARAMETER :: checkmd_nd = 0
 ! Switch for whether to check for bad values of MD and ND
 INTEGER, PARAMETER :: intraoff = 0
 ! Switch to turn off intra-modal coagulation
