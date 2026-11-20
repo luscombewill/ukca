@@ -823,7 +823,7 @@ IF (ddepaer_on == 1) THEN
 END IF ! DDEPAER_ON=1
 !
 !     Loop over number of microphysics timesteps NMTS
-DO imts=1,nmts
+DO imts=1,nmts !WL: nmts = 1
   !
   !     Calculate rate of condensation of gases onto existing particles
   !     and nucleation rate
@@ -875,7 +875,7 @@ DO imts=1,nmts
     kij_arr(:,:,:) = 0.0
   END IF
   !
-  DO izts=1,nzts
+  DO izts=1,nzts !WL: nzts = glomap_config%i_mode_nzts = 15
     !
     IF (verbose >= 2) THEN
       WRITE(strizts,'(1i2.2)') izts
@@ -1204,6 +1204,12 @@ DO imts=1,nmts
   END IF ! if ICHEM = 1
   !
 END DO ! end loop over NMTS
+
+IF (verbose >= 2) THEN
+  WRITE(umMessage,'(A40)') 'At end of UKCA_AERO_STEP:   ND,MD,MDT'
+  CALL umPrint(umMessage,src='ukca_aero_step')
+  CALL ukca_calcminmaxndmdt(nbox,nd,mdt,verbose)
+END IF
 
 IF (lhook) CALL dr_hook(ModuleName//':'//RoutineName,zhook_out,zhook_handle)
 RETURN
