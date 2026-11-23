@@ -316,6 +316,19 @@ DO imode=1,nmodes
   END IF
 END DO
 
+! --- TEST FIX from google gemini ---!
+! Diagnostic cap on dry diameter (10 microns = 1.0e-5 m)
+DO imode = 1, nmodes
+  IF (mode(imode)) THEN
+    DO jl = 1, nbox
+      IF (drydp(jl, imode) > 1.0e-5) THEN
+        drydp(jl, imode) = 1.0e-5
+      END IF
+    END DO
+  END IF
+END DO
+
+
 IF (lhook) CALL dr_hook(ModuleName//':'//RoutineName,zhook_out,zhook_handle)
 RETURN
 END SUBROUTINE ukca_calc_drydiam
