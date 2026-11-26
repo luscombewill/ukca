@@ -458,7 +458,7 @@ INTEGER :: iactmethod
 INTEGER :: inucscav
 ! Switch for nucl scav method (1=as GLOMAP Spr05, 2=use M7 scav coeffs,
 !                              3=as (1) but no nucl scav of modes 6 & 7)
-INTEGER, PARAMETER :: iddepaer = 2
+INTEGER, PARAMETER :: iddepaer = 1
 ! Switch for dry dep method (1=as GLOMAP Spr05, 2=incl. sedi)
 !      INTEGER, PARAMETER :: IDDEPAER=1
 ! Switch for dry dep method (1=as GLOMAP Spr05, 2=incl. sedi)
