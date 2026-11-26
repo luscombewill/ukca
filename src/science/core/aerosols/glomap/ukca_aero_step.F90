@@ -541,31 +541,31 @@ END IF
 CALL ukca_calc_drydiam( nbox, glomap_variables,                                &
                         nd, md, mdt, drydp, dvol )
 
-! ------ Test turing off Remode ---------!
-! !     Initial remode call (check if advection taken DRYDP out of bounds)
-! CALL ukca_remode(nbox,nbudaer,nd,md,mdt,drydp,                                 &
-!                  imerge,bud_aer_mas,n_merge_1d,pmid)
 
-! !
-! IF (checkmd_nd == 1) THEN
-!   process='Done UKCA_REMODE (1st call)   '
-!   CALL ukca_check_md_nd(nbox,process,nd,md,mdt)
-! END IF
-! !
-! IF (verbose >= 2) THEN
-!   WRITE(umMessage,'(A40)') 'After UKCA_REMODE1 has updated ND,MD,MDT'
-!   CALL umPrint(umMessage,src='ukca_aero_step')
-!   CALL ukca_calcminmaxndmdt(nbox,nd,mdt,verbose)
-! END IF
-! !
-! !     Recalculate dry and wet diameter and volume
-! CALL ukca_calc_drydiam( nbox, glomap_variables,                                &
-!                         nd, md, mdt, drydp, dvol )
-! !
-! CALL ukca_volume_mode(glomap_variables,nbox, nd,md,mdt,                        &
-!                       RH_clr,dvol,drydp,t,pmid,s,                              &
-!                       mdwat,wvol,wetdp,rhopar,pvol,pvol_wat)
-! ------ End Test turing off Remode ---------!
+!     Initial remode call (check if advection taken DRYDP out of bounds)
+CALL ukca_remode(nbox,nbudaer,nd,md,mdt,drydp,                                 &
+                 imerge,bud_aer_mas,n_merge_1d,pmid)
+
+!
+IF (checkmd_nd == 1) THEN
+  process='Done UKCA_REMODE (1st call)   '
+  CALL ukca_check_md_nd(nbox,process,nd,md,mdt)
+END IF
+!
+IF (verbose >= 2) THEN
+  WRITE(umMessage,'(A40)') 'After UKCA_REMODE1 has updated ND,MD,MDT'
+  CALL umPrint(umMessage,src='ukca_aero_step')
+  CALL ukca_calcminmaxndmdt(nbox,nd,mdt,verbose)
+END IF
+!
+!     Recalculate dry and wet diameter and volume
+CALL ukca_calc_drydiam( nbox, glomap_variables,                                &
+                        nd, md, mdt, drydp, dvol )
+!
+CALL ukca_volume_mode(glomap_variables,nbox, nd,md,mdt,                        &
+                      RH_clr,dvol,drydp,t,pmid,s,                              &
+                      mdwat,wvol,wetdp,rhopar,pvol,pvol_wat)
+
 !
 !     Calculate impaction scavenging of aerosol (washout)
 IF (imscav_on == 1) THEN
@@ -1155,33 +1155,31 @@ DO imts=1,nmts !WL: nmts = 1
                         mdwat,wvol,wetdp,rhopar,pvol,pvol_wat)
 
 
-  ! ------ Test turing off Remode ---------!
-  ! !
-  ! !      Apply mode-merging where necessary
-  ! CALL ukca_remode(nbox,nbudaer,nd,md,mdt,drydp,                               &
-  !                  imerge,bud_aer_mas,n_merge_1d,pmid)
-  ! !
-  ! IF (checkmd_nd == 1) THEN
-  !   process='Done UKCA_REMODE              '
-  !   CALL ukca_check_md_nd(nbox,process,nd,md,mdt)
-  ! END IF
-  ! !
-  ! IF (verbose >= 2) THEN
-  !   WRITE(umMessage,'(A40)') 'After UKCA_REMODE has updated ND,MD,MDT'
-  !   CALL umPrint(umMessage,src='ukca_aero_step')
-  !   CALL ukca_calcminmaxndmdt(nbox,nd,mdt,verbose)
-  ! END IF
-  ! !
-  ! ! Recalculate dry and wet diameter and volume after re-moding
-  ! CALL ukca_calc_drydiam( nbox, glomap_variables,                              &
-  !                         nd, md, mdt, drydp, dvol )
+  !
+  !      Apply mode-merging where necessary
+  CALL ukca_remode(nbox,nbudaer,nd,md,mdt,drydp,                               &
+                   imerge,bud_aer_mas,n_merge_1d,pmid)
+  !
+  IF (checkmd_nd == 1) THEN
+    process='Done UKCA_REMODE              '
+    CALL ukca_check_md_nd(nbox,process,nd,md,mdt)
+  END IF
+  !
+  IF (verbose >= 2) THEN
+    WRITE(umMessage,'(A40)') 'After UKCA_REMODE has updated ND,MD,MDT'
+    CALL umPrint(umMessage,src='ukca_aero_step')
+    CALL ukca_calcminmaxndmdt(nbox,nd,mdt,verbose)
+  END IF
+  !
+  ! Recalculate dry and wet diameter and volume after re-moding
+  CALL ukca_calc_drydiam( nbox, glomap_variables,                              &
+                          nd, md, mdt, drydp, dvol )
 
-  ! !
-  ! CALL ukca_volume_mode(glomap_variables,nbox, nd,md,mdt,                      &
-  !                       RH_clr,dvol,drydp,t,pmid,s,                            &
-  !                       mdwat,wvol,wetdp,rhopar,pvol,pvol_wat)
+  !
+  CALL ukca_volume_mode(glomap_variables,nbox, nd,md,mdt,                      &
+                        RH_clr,dvol,drydp,t,pmid,s,                            &
+                        mdwat,wvol,wetdp,rhopar,pvol,pvol_wat)
 
-  ! ------ end Test turing off Remode ---------!
   IF (ichem == 1) THEN
     !
     DO jv=1,nchemg
